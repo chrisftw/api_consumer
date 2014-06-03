@@ -1,0 +1,11 @@
+wikipedia:
+  url: "http://en.wikipedia.org"
+  ssl: false
+  name: "Wikipedia"
+  use_memcache: true
+  memcache_hosts:
+    - "localhost:11211"
+  cache_prefix: "wikipedia-dev"
+  type: json
+#  auth_key: "SOME AUTH KEY"
+#  misc_setting: "ANY OTHER SETTING YOU WOULD LIKE TO USE, CALL IT WHATEVER YOU LIKE"
