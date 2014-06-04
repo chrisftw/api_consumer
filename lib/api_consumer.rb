@@ -1,16 +1,49 @@
 class APIConsumer
   require 'yaml'
-  require "net/https"
-  require "uri"
-  require "json"
+  require 'net/https'
+  require 'uri'
+  require 'json'
   require 'uber_cache'
+  require 'logger'
 
   class << self
     @settings = {}
     def inherited(subclass)
       configs = YAML.load_file("config/#{snake_case(subclass)}.yml")
       configs[snake_case(subclass)].each{ |k,v| subclass.set(k.to_sym, v) }
+      self.logger = Logger.new(settings[:log_file] || "./log/#{snake_case(subclass)}_api.log")
+      set_log_level(settings[:log_level])
       super
+    end
+    
+    def logger=(logger)
+      @@logger = logger.nil? ? Logger.new(STDERR) : logger
+    end
+    
+    def log
+      @@logger
+    end
+    
+    def set_log_level(level=nil)
+      if level.nil?
+        level = if([nil, "development", "test"].include?(ENV['RACK_ENV']))
+          :info
+        else
+          :warn
+        end
+      end
+      log.level = case level.to_sym
+      when :debug
+        Logger::DEBUG
+      when :info
+        Logger::INFO
+      when :error
+        Logger::ERROR
+      when :fatal
+        Logger::FATAL
+      else #warn
+        Logger::WARN
+      end
     end
     
     def memcache?
@@ -39,14 +72,12 @@ class APIConsumer
       elsif( opts[:method] == :post)
         Net::HTTP::Post.new(path)
       else
-        puts "BUG - method=>(#{opts[:method]})"
+        log.error "BUG - method=>(#{opts[:method]})"
       end
       opts[:headers].each { |k,v| req[k] = v }
       req.basic_auth settings[:api_user], settings[:api_password] if settings[:api_user] && settings[:api_password]
       req["connection"] = 'keep-alive'
       req.body = opts[:body] if opts[:body]
-      #puts( "REQUEST!!! #{opts[:headers]} #{path};\n#{@uri.host}:::#{@uri.port}")
-      #puts("BODY: #{req.body}")
 
       response = nil
       begin
@@ -59,12 +90,10 @@ class APIConsumer
           return results
         end
       rescue Exception => exception
-        puts exception.message
-        puts exception.backtrace
-        puts "================="
-        # Airbrake.notify(exception)
+        log.error exception.message
+        log.error exception.backtrace
         if( settings[:type] == "json")
-          return error_code(response.code, opts[:errors])
+          return error_code(response ? response.code : "NO CODE" , opts[:errors])
         end
       end
       return response.body
@@ -78,7 +107,7 @@ class APIConsumer
     
     def create_connection(debug = false)
       if @uri.nil? || @uri.port.nil?
-        #puts "TRYING TO CONNECT: #{settings[:url]}"
+        log.info "CONNECTING TO: #{settings[:url]}"
         @uri = URI.parse("#{settings[:url]}/")
       end
       http = Net::HTTP.new(@uri.host, @uri.port)

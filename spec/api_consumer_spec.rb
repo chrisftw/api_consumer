@@ -33,4 +33,14 @@ describe APIConsumer do
       expect(result["query"]["pages"]["45481"]["revisions"][0]["*"].include?("[[Richard Fleischer]]")).to eq(true)
     end
   end
+  
+  describe "logger" do
+    it "should create a logger automagically" do
+      expect(Wikipedia.log).not_to eq(nil)
+    end
+    
+    it "should write to the logger" do
+      expect{Wikipedia.log.warn("hello logger")}.not_to raise_error
+    end
+  end
 end
