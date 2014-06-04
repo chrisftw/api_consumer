@@ -11,17 +11,17 @@ class APIConsumer
     def inherited(subclass)
       configs = YAML.load_file("config/#{snake_case(subclass)}.yml")
       configs[snake_case(subclass)].each{ |k,v| subclass.set(k.to_sym, v) }
-      self.logger = Logger.new(settings[:log_file] || "./log/#{snake_case(subclass)}_api.log")
-      set_log_level(settings[:log_level])
+      subclass.set_logger(Logger.new(settings[:log_file] || "./log/#{snake_case(subclass)}_api.log"), settings[:log_level])
       super
     end
     
-    def logger=(logger)
-      @@logger = logger.nil? ? Logger.new(STDERR) : logger
+    def set_logger(logger, level=nil)
+      @logger = logger.nil? ? Logger.new(STDERR) : logger
+      set_log_level(level)
     end
     
     def log
-      @@logger
+      @logger
     end
     
     def set_log_level(level=nil)
@@ -32,7 +32,7 @@ class APIConsumer
           :warn
         end
       end
-      log.level = case level.to_sym
+      @logger.level = case level.to_sym
       when :debug
         Logger::DEBUG
       when :info

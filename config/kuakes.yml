@@ -1,0 +1,11 @@
+kuakes:
+  url: "http://www.kuakes.com"
+  ssl: false
+  name: "Kuakes"
+  use_memcache: true
+  memcache_hosts:
+    - "localhost:11211"
+  cache_prefix: "kuakes-dev"
+  type: json
+  log_file: "log/kuakes_custom_log.log"
+  log_level: error

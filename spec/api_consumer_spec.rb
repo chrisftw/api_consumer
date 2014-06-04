@@ -1,5 +1,6 @@
 require 'spec_helper'
 require './examples/wikipedia.rb'
+require './examples/kuakes.rb'
 
 describe APIConsumer do
   describe "cache" do
@@ -25,12 +26,23 @@ describe APIConsumer do
         :get, "http://en.wikipedia.org/w/api.php?format=json&action=query&titles=Soylent%20Green&prop=revisions&rvprop=content",
         :body => File.read("spec/mock/api_responses/soylent_green.json")
       )
+      FakeWeb.register_uri(
+        :get, "http://www.kuakes.com/json/",
+        :body => File.read("spec/mock/api_responses/kuakes.json")
+      )
+      
     end
     
     it "should call api" do
       result = Wikipedia.fetch("Soylent Green")
       expect(result["query"]["pages"]["45481"]["title"]).to eq("Soylent Green")
       expect(result["query"]["pages"]["45481"]["revisions"][0]["*"].include?("[[Richard Fleischer]]")).to eq(true)
+    end
+    
+    it "should call other APIs setup with api_consumer" do
+      quakes = Kuakes.all(true)
+      expect(quakes.length).to eq(50)
+      expect(quakes[1]["title"].include?("Corralitos, California")).to eq(true)
     end
   end
   
@@ -41,6 +53,10 @@ describe APIConsumer do
     
     it "should write to the logger" do
       expect{Wikipedia.log.warn("hello logger")}.not_to raise_error
+    end
+    
+    it "should read custom log files from settings" do
+      Kuakes.log.error("sample error")
     end
   end
 end
