@@ -62,8 +62,21 @@ class APIConsumer
       @settings ||= {}
     end
     
-    DEFAULT_REQUEST_OPTS = {:method => :get, :headers => { "Accept" => "application/json", "Content-Type" => "application/json", "User-Agent" => "EME-WEB-STORE-#{ENV['RACK_ENV']|| 'dev'}" }}
-    def do_request(path, conn, opts = {})
+    DEFAULT_REQUEST_OPTS = {
+      :method => :get,
+      :headers => {
+        "Accept" => "application/json",
+        "Content-Type" => "application/json",
+        "User-Agent" => "API-CONSUMER-#{ENV['RACK_ENV'] || 'dev'}"
+      },
+      :ttl => 300
+    }
+    def do_request(path, conn, opts = {}, &blk)
+      if opts[:key] # cache if key sent
+        read_val = nil
+        return read_val if !opts[:reload] && read_val = cache.obj_read(opts[:key])
+        opts[:ttl] ||= settings[:ttl] || DEFAULT_REQUEST_OPTS[:ttl]
+      end
       opts[:headers] = DEFAULT_REQUEST_OPTS[:headers].merge(opts[:headers] || {})
       opts[:method] = opts[:method] || DEFAULT_REQUEST_OPTS[:method]
 
@@ -81,12 +94,16 @@ class APIConsumer
 
       response = nil
       begin
+        log.warn conn.inspect
+        log.warn req.inspect
         response = conn.request(req)
         if( settings[:type] == "json")
           results = JSON.parse(response.body)
           if ![200, 201].include?(response.code.to_i)
             results = error_code(response.code, opts[:errors])
           end
+          results = blk.call(results) if blk
+          cache.obj_write(opts[:key], results, :ttl => opts[:ttl]) if opts[:key]
           return results
         end
       rescue Exception => exception
@@ -96,7 +113,10 @@ class APIConsumer
           return error_code(response ? response.code : "NO CODE" , opts[:errors])
         end
       end
-      return response.body
+      data = response.body
+      data = blk.call(data) if blk
+      cache.obj_write(opts[:key], data, :ttl => opts[:ttl]) if opts[:key]
+      return data
     end
     
     def connection(connection_flag = :normal)

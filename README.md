@@ -28,4 +28,4 @@ Basically, you need to Ruby class to be your API consumer. Create a yaml file fo
 * More instructions
 * More examples
 * Remove duplication
-* Make caching even more simple / move to the do_request method
+* Make caching even more simple / move to the do_request method (DONE in master, releasing in v0.0.3)

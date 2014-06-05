@@ -7,5 +7,5 @@ wikipedia:
     - "localhost:11211"
   cache_prefix: "wikipedia-dev"
   type: json
+  random_setting: "custom config settings here"
 #  auth_key: "SOME AUTH KEY"
-#  misc_setting: "ANY OTHER SETTING YOU WOULD LIKE TO USE, CALL IT WHATEVER YOU LIKE"
