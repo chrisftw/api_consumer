@@ -80,6 +80,18 @@ describe APIConsumer do
     end
   end
   
+  describe "parsing" do
+    it "should parse json" do
+      pending "need to write this test still"
+      fail
+    end
+    
+    it "should parse rss" do
+      pending "need to write this test still"
+      fail
+    end
+  end
+  
   describe "api" do
     before do
       FakeWeb.register_uri(

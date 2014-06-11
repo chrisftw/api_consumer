@@ -3,6 +3,7 @@ class APIConsumer
   require 'net/https'
   require 'uri'
   require 'json'
+  require 'nokogiri'
   require 'uber_cache'
   require 'logger'
 
@@ -105,6 +106,14 @@ class APIConsumer
           results = blk.call(results) if blk
           cache.obj_write(opts[:key], results, :ttl => opts[:ttl]) if opts[:key]
           return results
+        elsif( settings[:type] == "rss")
+          rss = Nokogiri::XML(response.body)
+          return rss.xpath("//item").map{ |i|
+            { 'title' => i.xpath('title').inner_text,
+              'link' => i.xpath('link').inner_text,
+              'description' => i.xpath('description').inner_text
+            }
+          }
         end
       rescue Exception => exception
         log.error exception.message
