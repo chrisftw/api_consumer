@@ -89,6 +89,7 @@ class APIConsumer
         log.error "BUG - method=>(#{opts[:method]})"
       end
       opts[:headers].each { |k,v| req[k] = v }
+      settings[:headers].each { |k,v| req[k] = v }
       req.basic_auth settings[:api_user], settings[:api_password] if settings[:api_user] && settings[:api_password]
       req["connection"] = 'keep-alive'
       req.body = opts[:body] if opts[:body]
@@ -114,6 +115,8 @@ class APIConsumer
               'description' => i.xpath('description').inner_text
             }
           }
+        elsif( settings[:type] == "xml")
+          return Nokogiri::XML(response.body)
         end
       rescue Exception => exception
         log.error exception.message
