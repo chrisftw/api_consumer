@@ -89,7 +89,7 @@ class APIConsumer
         log.error "BUG - method=>(#{opts[:method]})"
       end
       opts[:headers].each { |k,v| req[k] = v }
-      settings[:headers].each { |k,v| req[k] = v }
+      settings[:headers].each { |k,v| req[k] = v } if settings[:headers]
       req.basic_auth settings[:api_user], settings[:api_password] if settings[:api_user] && settings[:api_password]
       req["connection"] = 'keep-alive'
       req.body = opts[:body] if opts[:body]
