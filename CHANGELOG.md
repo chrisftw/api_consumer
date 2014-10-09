@@ -1,11 +1,12 @@
-## 0.0.4 (2014-09-02)
+## 0.0.4 (2014-10-08)
 
 Bugfixes:
 
-  - None
+  - snake_case method converts "::" to "_" instead of "/" (@chrisftw)
 
 Features:
 
+  - add verbose mode additions to connections got more visibility (@chrisftw)
   - add xml parsing (@chrisftw)
   - add custom headers in settings (@chrisftw)
 

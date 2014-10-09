@@ -73,6 +73,9 @@ class APIConsumer
       :ttl => 300
     }
     def do_request(path, conn, opts = {}, &blk)
+      if(opts[:verbose])
+        log.debug("Sending request to: #{conn.address}/#{path}")
+      end
       if opts[:key] # cache if key sent
         read_val = nil
         return read_val if !opts[:reload] && read_val = cache.obj_read(opts[:key])
@@ -96,8 +99,8 @@ class APIConsumer
 
       response = nil
       begin
-        log.warn conn.inspect
-        log.warn req.inspect
+        log.warn "CONN:" + conn.inspect
+        log.warn "REQ:" + req.inspect
         response = conn.request(req)
         if( settings[:type] == "json")
           results = JSON.parse(response.body)
@@ -159,7 +162,7 @@ class APIConsumer
 
     private
     def snake_case(camel_cased_word)
-      camel_cased_word.to_s.gsub(/::/, '/').
+      camel_cased_word.to_s.gsub(/::/, '_').
       gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
       gsub(/([a-z\d])([A-Z])/,'\1_\2').
       tr("-", "_").
