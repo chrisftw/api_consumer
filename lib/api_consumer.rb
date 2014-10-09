@@ -12,7 +12,7 @@ class APIConsumer
     def inherited(subclass)
       configs = YAML.load_file("config/#{snake_case(subclass)}.yml")
       configs[snake_case(subclass)].each{ |k,v| subclass.set(k.to_sym, v) }
-      subclass.set_logger(Logger.new(settings[:log_file] || "./log/#{snake_case(subclass)}_api.log"), settings[:log_level])
+      subclass.set_logger(Logger.new(subclass.settings[:log_file] || "./log/#{snake_case(subclass)}_api.log"), subclass.settings[:log_level])
       super
     end
     
@@ -74,7 +74,7 @@ class APIConsumer
     }
     def do_request(path, conn, opts = {}, &blk)
       if(opts[:verbose])
-        log.debug("Sending request to: #{conn.address}/#{path}")
+        log.debug("Sending request to: #{conn.address}#{':' + conn.port.to_s if conn.port}#{path}")
       end
       if opts[:key] # cache if key sent
         read_val = nil
@@ -99,8 +99,8 @@ class APIConsumer
 
       response = nil
       begin
-        log.warn "CONN:" + conn.inspect
-        log.warn "REQ:" + req.inspect
+        log.debug "CONN:" + conn.inspect
+        log.debug "REQ:" + req.inspect
         response = conn.request(req)
         if( settings[:type] == "json")
           results = JSON.parse(response.body)
