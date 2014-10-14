@@ -88,6 +88,10 @@ class APIConsumer
         Net::HTTP::Get.new(path)
       elsif( opts[:method] == :post)
         Net::HTTP::Post.new(path)
+      elsif( opts[:method] == :delete)
+        Net::HTTP::Delete.new(path)
+      elsif( opts[:method] == :put)
+        Net::HTTP::Put.new(path)
       else
         log.error "BUG - method=>(#{opts[:method]})"
       end
