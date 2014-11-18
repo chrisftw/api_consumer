@@ -109,7 +109,7 @@ class APIConsumer
         if( settings[:type] == "json")
           results = JSON.parse(response.body)
           if ![200, 201].include?(response.code.to_i)
-            results = error_code(response.code, opts[:errors])
+            results = error_code(response.code, opts[:errors], results)
           end
           results = blk.call(results) if blk
           cache.obj_write(opts[:key], results, :ttl => opts[:ttl]) if opts[:key]
@@ -173,9 +173,10 @@ class APIConsumer
       downcase
     end
     
-    def error_code(code, errors = nil)
-      return {:error => true, :message => errors[code.to_s]} if errors && errors[code.to_s]
-      return {:error => true, :message => "API error: #{code}" }
+    def error_code(code, errors = nil, response = nil)
+      ret_val = {:error => true, :message => (errors && errors[code.to_s] ? errors[code.to_s] : "API error: #{code}" )}
+      ret_val[:response] = response if response
+      return ret_val
     end
   end
 end
