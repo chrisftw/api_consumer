@@ -1,3 +1,11 @@
+
+## 0.0.5
+
+Bugfixes:
+
+  - Added delete and put calls (@chrisftw)
+  - Send parsed json error data with generated error message (@minjae-lee)
+
 ## 0.0.4 (2014-10-08)
 
 Bugfixes:
