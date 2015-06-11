@@ -1,14 +1,20 @@
 
+## 0.0.6
+
+Bug fixes/Features:
+
+  - Actually parse xml into a hash using nori (@chrisftw)
+
 ## 0.0.5
 
-Bugfixes:
+Bug fixes:
 
   - Added delete and put calls (@chrisftw)
   - Send parsed json error data with generated error message (@minjae-lee)
 
 ## 0.0.4 (2014-10-08)
 
-Bugfixes:
+Bug fixes:
 
   - snake_case method converts "::" to "_" instead of "/" (@chrisftw)
 
@@ -20,7 +26,7 @@ Features:
 
 ## 0.0.3 (2014-06-11)
 
-Bugfixes:
+Bug fixes:
 
   - None
 
@@ -31,7 +37,7 @@ Features:
 
 ## 0.0.2 (2014-06-04)
 
-Bugfixes:
+Bug fixes:
 
   - None
 

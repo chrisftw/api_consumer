@@ -4,6 +4,7 @@ class APIConsumer
   require 'uri'
   require 'json'
   require 'nokogiri'
+  require 'nori'
   require 'uber_cache'
   require 'logger'
 
@@ -93,7 +94,7 @@ class APIConsumer
       elsif( opts[:method] == :put)
         Net::HTTP::Put.new(path)
       else
-        log.error "BUG - method=>(#{opts[:method]})"
+        log.error "Unhandled HTTP method => (#{opts[:method]})"
       end
       opts[:headers].each { |k,v| req[k] = v }
       settings[:headers].each { |k,v| req[k] = v } if settings[:headers]
@@ -123,7 +124,7 @@ class APIConsumer
             }
           }
         elsif( settings[:type] == "xml")
-          return Nokogiri::XML(response.body)
+          return Nori.new(nori_settings).parse(response.body)
         end
       rescue Exception => exception
         log.error exception.message
@@ -171,6 +172,14 @@ class APIConsumer
       gsub(/([a-z\d])([A-Z])/,'\1_\2').
       tr("-", "_").
       downcase
+    end
+    
+    def nori_settings
+      nori_sets = {}
+      if settings[:nori_settings].kind_of?(Hash)
+        settings[:nori_settings].each{|k, v| nori_sets[k.to_sym] = v}
+      end
+      return nori_sets
     end
     
     def error_code(code, errors = nil, response = nil)

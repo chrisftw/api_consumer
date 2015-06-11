@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'api_consumer'
-  s.version     = '0.0.5'
-  s.date        = '2014-11-17'
+  s.version     = '0.0.6'
+  s.date        = '2015-06-11'
   s.summary     = "Consume all the APIs"
   s.description = "Easy to use API consumer - Setup your API connection in a yaml file, and use the helper methods to make easy access APIs calls"
   s.authors     = ["Chris Reister"]
@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   
   s.add_runtime_dependency 'uber_cache', '~> 0.0'
   s.add_runtime_dependency 'nokogiri', '~> 1.5'
+  s.add_runtime_dependency 'nori', '~> 2.6'
   
   # might work with older development_dependencies.
   s.add_development_dependency 'rspec', '~> 3.0'
