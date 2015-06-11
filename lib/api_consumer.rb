@@ -113,7 +113,13 @@ class APIConsumer
             results = error_code(response.code, opts[:errors], results)
           end
           results = blk.call(results) if blk
-          cache.obj_write(opts[:key], results, :ttl => opts[:ttl]) if opts[:key]
+          begin
+            cache.obj_write(opts[:key], results, :ttl => opts[:ttl]) if opts[:key]
+          rescue Exception => exception
+            # write error messages to the log file but ignore exceptions in writing data to cache
+            log.error exception.message
+            log.error exception.backtrace
+          end
           return results
         elsif( settings[:type] == "rss")
           rss = Nokogiri::XML(response.body)
