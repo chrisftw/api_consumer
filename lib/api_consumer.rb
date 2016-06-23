@@ -99,7 +99,7 @@ class APIConsumer
       opts[:headers].each { |k,v| req[k] = v }
       settings[:headers].each { |k,v| req[k] = v } if settings[:headers]
       req.basic_auth settings[:api_user], settings[:api_password] if settings[:api_user] && settings[:api_password]
-      req["connection"] = 'keep-alive'
+      req["connection"] = 'keep-alive' if settings[:keep_alive]
       req.body = opts[:body] if opts[:body]
 
       response = nil
