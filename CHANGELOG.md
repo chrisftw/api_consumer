@@ -1,3 +1,6 @@
+## 0.0.7
+
+  - Accept 202 codes by default, allow settings for more accept codes. (@chrisftw)
 
 ## 0.0.6
 

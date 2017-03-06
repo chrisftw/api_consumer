@@ -109,7 +109,9 @@ class APIConsumer
         response = conn.request(req)
         if( settings[:type] == "json")
           results = JSON.parse(response.body)
-          if ![200, 201].include?(response.code.to_i)
+          good_codes = [200, 201, 202] 
+          good_codes += settings[:accept_codes].map(&:to_i) if settings[:accept_codes]
+          if !good_codes.include?(response.code.to_i)
             results = error_code(response.code, opts[:errors], results)
           end
           results = blk.call(results) if blk
@@ -136,7 +138,7 @@ class APIConsumer
         log.error exception.message
         log.error exception.backtrace
         if( settings[:type] == "json")
-          return error_code(response ? response.code : "NO CODE" , opts[:errors])
+          return error_code(response ? response.code : "NO CODE" , opts[:errors], response.body)
         end
       end
       data = response.body
